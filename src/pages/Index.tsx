@@ -1,9 +1,11 @@
-
-import { useState } from 'react';
-import { SearchHeader } from '@/components/SearchHeader';
-import { ResultsList } from '@/components/ResultsList';
-import { EmptyState } from '@/components/EmptyState';
-import { LoadingState } from '@/components/LoadingState';
+import { EmptyState } from "@/components/EmptyState";
+import { LoadingState } from "@/components/LoadingState";
+import { ResultsList } from "@/components/ResultsList";
+import { SearchHeader } from "@/components/SearchHeader";
+import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { searchSellers } from "@/services/api";
+import { useState } from "react";
 
 interface Lojista {
   id: string;
@@ -15,55 +17,112 @@ interface Lojista {
 }
 
 const Index = () => {
-  const [categoria, setCategoria] = useState('');
+  const [categoria, setCategoria] = useState("");
   const [resultados, setResultados] = useState<Lojista[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
 
-  const handleBuscar = async () => {
-    if (!categoria.trim()) return;
-    
+  const handleBuscar = async (plataforma?: string) => {
+    if (!categoria.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, insira uma categoria para buscar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     setHasSearched(true);
-    
+
     try {
-      // Simulação de dados para demonstração
-      // Em produção, aqui seria a chamada para o webhook/API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const dadosSimulados: Lojista[] = [
-        {
-          id: '1',
-          nome_loja: 'Pet Shop Center',
-          link: 'https://petshop-center.com.br',
-          plataforma: 'Shopee',
-          categoria: categoria,
-          data_extracao: new Date().toISOString()
-        },
-        {
-          id: '2', 
-          nome_loja: 'Mundo Pet',
-          link: 'https://mundopet.com.br',
-          plataforma: 'Mercado Livre',
-          categoria: categoria,
-          data_extracao: new Date().toISOString()
-        },
-        {
-          id: '3',
-          nome_loja: 'Pet & Cia',
-          link: 'https://petecia.com.br',
-          plataforma: 'Shopee',
-          categoria: categoria,
-          data_extracao: new Date().toISOString()
+      // Primeiro, buscar dados existentes no Supabase
+      let query = supabase
+        .from("lojistas")
+        .select("*")
+        .ilike("categoria", `%${categoria.trim()}%`)
+        .order("nome_loja", { ascending: true });
+
+      if (plataforma) {
+        query = query.eq("plataforma", plataforma);
+      }
+
+      const { data: existingData, error: supabaseError } = await query;
+
+      if (supabaseError) {
+        throw supabaseError;
+      }
+
+      // Se não houver dados ou se os dados forem antigos, fazer nova extração
+      const shouldExtract =
+        !existingData ||
+        existingData.length === 0 ||
+        existingData.some((item) => {
+          const extractionDate = new Date(item.data_extracao);
+          const oneDayAgo = new Date();
+          oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+          return extractionDate < oneDayAgo;
+        });
+
+      if (shouldExtract && (!plataforma || plataforma === "Shopee")) {
+        setIsExtracting(true);
+        toast({
+          title: "Extraindo dados",
+          description: "Buscando novos lojistas na Shopee...",
+        });
+
+        try {
+          const newData = await searchSellers(categoria.trim());
+          setResultados(newData);
+
+          toast({
+            title: "Extração concluída",
+            description: `Foram encontrados ${newData.length} novos lojistas na Shopee`,
+          });
+        } catch (error) {
+          console.error("Erro na extração:", error);
+          toast({
+            title: "Erro na extração",
+            description:
+              "Não foi possível extrair novos dados da Shopee. Mostrando dados existentes.",
+            variant: "destructive",
+          });
+          setResultados(existingData || []);
+        } finally {
+          setIsExtracting(false);
         }
-      ];
-      
-      setResultados(dadosSimulados);
-      console.log('Busca realizada para categoria:', categoria);
-      
+      } else {
+        setResultados(existingData || []);
+      }
+
+      if (existingData && existingData.length > 0) {
+        toast({
+          title: "Sucesso",
+          description: `Encontrados ${
+            existingData.length
+          } lojistas para a categoria "${categoria}"${
+            plataforma ? ` na plataforma ${plataforma}` : ""
+          }`,
+        });
+      } else if (!shouldExtract) {
+        toast({
+          title: "Nenhum resultado",
+          description: `Não foram encontrados lojistas para a categoria "${categoria}"${
+            plataforma ? ` na plataforma ${plataforma}` : ""
+          }`,
+          variant: "default",
+        });
+      }
     } catch (error) {
-      console.error('Erro na busca:', error);
+      console.error("Erro na busca:", error);
       setResultados([]);
+      toast({
+        title: "Erro na busca",
+        description:
+          "Não foi possível realizar a busca. Tente novamente mais tarde.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -76,22 +135,26 @@ const Index = () => {
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Sistema de Extração de
-              <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent"> Lojistas</span>
+              <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                {" "}
+                Lojistas
+              </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Encontre e extraia dados de lojistas organizados por categoria de produtos
+              Encontre e extraia dados de lojistas organizados por categoria de
+              produtos
             </p>
           </div>
 
-          <SearchHeader 
+          <SearchHeader
             categoria={categoria}
             setCategoria={setCategoria}
             onBuscar={handleBuscar}
-            isLoading={isLoading}
+            isLoading={isLoading || isExtracting}
           />
 
           <div className="mt-8">
-            {isLoading ? (
+            {isLoading || isExtracting ? (
               <LoadingState />
             ) : hasSearched ? (
               resultados.length > 0 ? (
