@@ -57,41 +57,32 @@ app.post("/api/search-sellers", async (req, res) => {
     // Agrupa resultados por vendedor
     const sellerMap = new Map();
 
-    searchResults.shopping_results.forEach((item) => {
+    searchResults.shopping_results.forEach((item, idx) => {
       if (!item.source) return;
 
-      const baseUrl = item.link ? new URL(item.link).origin : null;
+      // Tenta pegar o melhor link possível
+      const lojaLink =
+        item.link || item.product_link || item.source_link || null;
 
-      if (!sellerMap.has(item.source)) {
+      // Log detalhado de cada item
+      console.log(`\n[API] Produto ${idx + 1}:`);
+      console.log(`  Nome: ${item.title}`);
+      console.log(`  Preço: ${item.price}`);
+      console.log(`  Loja: ${item.source}`);
+      console.log(`  Link: ${lojaLink}`);
+      console.log(`  Imagem: ${item.thumbnail || item.image || "N/A"}`);
+
+      // Só adiciona se tiver link válido
+      if (!sellerMap.has(item.source) && lojaLink) {
         sellerMap.set(item.source, {
           nome_loja: item.source,
-          link: baseUrl || "#",
+          link: lojaLink,
           plataforma: item.source,
           categoria: categoria,
           data_extracao: new Date().toISOString(),
-          produtos: [],
-          total_produtos: 0,
-          preco_medio: 0,
-          preco_minimo: Infinity,
-          preco_maximo: -Infinity,
+          imagem: item.thumbnail || item.image || null,
         });
       }
-
-      const seller = sellerMap.get(item.source);
-      const preco = extrairPreco(item.price);
-
-      seller.produtos.push({
-        nome: item.title || "N/A",
-        preco: preco,
-        link: item.link || "#",
-      });
-
-      seller.total_produtos++;
-      seller.preco_minimo = Math.min(seller.preco_minimo, preco);
-      seller.preco_maximo = Math.max(seller.preco_maximo, preco);
-      seller.preco_medio =
-        seller.produtos.reduce((acc, prod) => acc + prod.preco, 0) /
-        seller.produtos.length;
     });
 
     // Converte o Map em array e formata os resultados
@@ -102,6 +93,7 @@ app.post("/api/search-sellers", async (req, res) => {
         plataforma: seller.plataforma,
         categoria: seller.categoria,
         data_extracao: seller.data_extracao,
+        imagem: seller.imagem, // Só para resposta da API
       }))
       .filter(
         (seller) =>
@@ -111,6 +103,16 @@ app.post("/api/search-sellers", async (req, res) => {
           seller.categoria &&
           seller.data_extracao
       );
+
+    // Log final dos resultados enviados para o frontend
+    console.log("\n[API] Resultados enviados para o frontend:");
+    results.forEach((seller, idx) => {
+      console.log(
+        `  [${idx + 1}] Loja: ${seller.nome_loja} | Plataforma: ${
+          seller.plataforma
+        } | Link: ${seller.link} | Imagem: ${seller.imagem}`
+      );
+    });
 
     console.log(
       `\n✓ Processamento finalizado - ${results.length} lojas encontradas\n`
