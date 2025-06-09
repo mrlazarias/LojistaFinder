@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowUpDown, Calendar, ExternalLink, Store, Tag } from "lucide-react";
+import { ArrowUpDown, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 interface Lojista {
@@ -119,60 +119,46 @@ export const ResultsList = ({ resultados }: ResultsListProps) => {
         {paginatedResults.map((lojista) => (
           <Card
             key={lojista.id}
-            className="p-6 hover:shadow-lg transition-all duration-200 border-2 hover:border-blue-200 group"
+            className="group relative flex flex-col bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-200 overflow-hidden"
           >
-            <div className="space-y-4">
-              {lojista.imagem && (
+            {lojista.imagem && (
+              <div className="h-40 bg-gray-50 flex items-center justify-center">
                 <img
                   src={lojista.imagem}
                   alt={lojista.nome_loja}
-                  className="w-full h-24 object-contain mb-2 rounded"
+                  className="h-32 object-contain transition-transform duration-200 group-hover:scale-105"
                   loading="lazy"
                 />
-              )}
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                    <Store className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                      {lojista.nome_loja}
-                    </h3>
-                  </div>
-                </div>
+              </div>
+            )}
+            <div className="flex-1 flex flex-col p-5">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-lg text-gray-900 truncate">
+                  {lojista.nome_loja}
+                </h3>
                 <a
                   href={lojista.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-blue-600 transition-colors"
+                  className="text-blue-600 hover:text-emerald-600 transition-colors"
+                  title="Visitar loja"
                 >
                   <ExternalLink className="h-5 w-5" />
                 </a>
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Tag className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    {lojista.categoria}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    {formatarData(lojista.data_extracao)}
-                  </span>
-                </div>
-                <div
-                  className={`px-2 py-1 rounded-full text-sm inline-flex items-center gap-1 ${getPlataformaColor(
-                    lojista.plataforma
-                  )} border`}
-                >
+              <div className="flex flex-wrap gap-2 mb-2">
+                <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">
+                  {lojista.categoria}
+                </span>
+                <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">
                   {lojista.plataforma}
-                </div>
+                </span>
+              </div>
+              <div className="text-xs text-gray-400 mt-auto">
+                {formatarData(lojista.data_extracao)}
               </div>
             </div>
+            <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-300 pointer-events-none transition-all duration-200"></div>
           </Card>
         ))}
       </div>

@@ -19,7 +19,6 @@ interface SearchHeaderProps {
 }
 
 const categoriasSugeridas = [
-  "pet",
   "moda fitness",
   "suplementos",
   "eletrônicos",
@@ -61,7 +60,7 @@ export const SearchHeader = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
@@ -71,7 +70,7 @@ export const SearchHeader = ({
               placeholder="Ex: pet, moda fitness, suplementos"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
-              className="pl-10 h-12 text-lg border-2 focus:border-blue-500 transition-colors"
+              className="pl-10 h-14 text-lg border-2 focus:border-blue-500 transition-colors rounded-xl shadow-sm"
               disabled={isLoading}
             />
           </div>
@@ -82,7 +81,7 @@ export const SearchHeader = ({
               onValueChange={setPlataformaSelecionada}
               disabled={isLoading}
             >
-              <SelectTrigger className="w-[180px] h-12">
+              <SelectTrigger className="w-[180px] h-14 rounded-xl">
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4" />
                   <SelectValue placeholder="Plataforma" />
@@ -101,7 +100,7 @@ export const SearchHeader = ({
               type="submit"
               size="lg"
               disabled={isLoading}
-              className="h-12 px-8 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="h-14 px-10 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl rounded-xl text-lg"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -118,7 +117,7 @@ export const SearchHeader = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mt-2">
           <span className="text-sm text-gray-500 flex items-center gap-1 mr-2">
             <Tag className="h-4 w-4" />
             Sugestões:
@@ -128,7 +127,7 @@ export const SearchHeader = ({
               key={sugestao}
               type="button"
               onClick={() => handleSugestaoClick(sugestao)}
-              className="px-3 py-1 text-sm bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 rounded-full transition-colors duration-200 border border-gray-200 hover:border-blue-300"
+              className="px-4 py-1 text-sm bg-gradient-to-r from-blue-50 to-emerald-50 hover:from-blue-100 hover:to-emerald-100 text-blue-700 hover:text-emerald-700 rounded-full transition-colors duration-200 border border-blue-200 hover:border-emerald-300 font-medium shadow-sm"
               disabled={isLoading}
             >
               {sugestao}

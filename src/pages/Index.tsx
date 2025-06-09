@@ -130,12 +130,43 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
+      {/* Header moderno */}
+      <header className="w-full bg-black to-emerald-600 py-6 shadow-md mb-8">
+        <div className="container mx-auto flex items-center justify-between px-4">
+          <span className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 32 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="32" height="32" rx="8" fill="#fff" />
+              <path
+                d="M8 24V12a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v12"
+                stroke="#059669"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 20v-4a4 4 0 0 1 4-4v0a4 4 0 0 1 4 4v4"
+                stroke="#2563EB"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>LojistaFinder</span>
+          </span>
+          <span className="text-white text-sm opacity-80"></span>
+        </div>
+      </header>
+      {/* Fim do header */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Sistema de Extração de
-              <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+              <span className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
                 {" "}
                 Lojistas
               </span>

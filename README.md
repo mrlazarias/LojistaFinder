@@ -1,73 +1,122 @@
-# Welcome to your Lovable project
+# LojistaFinder
 
-## Project info
+Sistema moderno de extração e visualização de lojistas por categoria de produtos, com busca multi-marketplace, visual clean e ótima experiência de usuário.
 
-**URL**: https://lovable.dev/projects/ac706041-b094-4117-977e-382e97b58bad
+## ✨ Visão Geral
 
-## How can I edit this code?
+O LojistaFinder permite buscar lojistas em marketplaces (Shopee, Mercado Livre, Amazon, etc) a partir de uma categoria, exibindo resultados com imagem, nome, plataforma, data e link direto para a loja/produto. O sistema utiliza dados do Google Shopping via SerpAPI e armazena lojistas no Supabase para histórico e analytics.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🚀 Funcionalidades
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ac706041-b094-4117-977e-382e97b58bad) and start prompting.
+- Busca de lojistas por categoria (ex: "suplementos", "infantil")
+- Multi-marketplace: Shopee, Mercado Livre, Amazon, Americanas, etc
+- Cards modernos com imagem, nome, plataforma, data e link externo
+- Sugestões de categorias e filtros de plataforma
+- Persistência de lojistas no Supabase
+- Visual responsivo, UX aprimorada, loading states e empty state ilustrado
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🏗️ Arquitetura
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Frontend:** React + Vite + TypeScript + TailwindCSS
+  - Componentes modernos, responsivos e reutilizáveis
+  - Busca, exibição e UX aprimorada
+- **Backend:** Node.js + Express
+  - Endpoint `/api/search-sellers` faz a busca na SerpAPI (Google Shopping)
+  - Processa, agrupa e retorna lojistas com imagem, link, plataforma, etc
+- **Banco de Dados:** Supabase (PostgreSQL)
+  - Tabela `lojistas` para histórico e analytics
+  - Campos: `id`, `nome_loja`, `link`, `categoria`, `plataforma`, `data_extracao`
+- **Integrações:**
+  - [SerpAPI](https://serpapi.com/) para busca de produtos/lojas no Google Shopping
+  - [Supabase](https://supabase.com/) para persistência e queries
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🛠️ Instalação e Uso
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 1. Clone o repositório
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+git clone https://github.com/seu-usuario/lojista-finder.git
+cd lojista-finder
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 2. Configure as variáveis de ambiente
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Crie um arquivo `.env` na pasta `server/` com sua chave da SerpAPI:
+
+```
+SERPAPI_KEY=sua_chave_aqui
+```
+
+Configure também as variáveis do Supabase no frontend (`.env` na raiz ou conforme integração).
+
+### 3. Instale as dependências
+
+```bash
+# Backend
+cd server
+npm install
+
+# Frontend
+cd ../
+npm install
+```
+
+### 4. Rode o backend
+
+```bash
+cd server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### 5. Rode o frontend
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+cd ..
+npm run dev
+```
 
-**Use GitHub Codespaces**
+Acesse em [http://localhost:5178](http://localhost:5178)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 📦 Estrutura de Pastas
 
-This project is built with:
+```
+lojista-finder/
+├── server/           # Backend Express (Node.js)
+│   └── index.js      # API principal
+├── src/              # Frontend React
+│   ├── components/   # Componentes visuais
+│   ├── pages/        # Páginas principais
+│   ├── services/     # Integrações API/Supabase
+│   └── ...
+├── public/           # Assets estáticos (imagens, favicon, etc)
+├── README.md         # Este arquivo
+└── ...
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 🧩 Como funciona a busca
 
-Simply open [Lovable](https://lovable.dev/projects/ac706041-b094-4117-977e-382e97b58bad) and click on Share -> Publish.
+1. Usuário digita uma categoria e clica em buscar
+2. Frontend chama `/api/search-sellers` no backend
+3. Backend consulta SerpAPI (Google Shopping), processa e retorna lojistas
+4. Frontend exibe cards modernos com imagem, nome, plataforma, data e link
+5. Dados são salvos no Supabase para histórico e analytics
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 📝 Observações
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- O campo de imagem não é salvo no banco, apenas exibido na busca
+- O sistema é facilmente extensível para novas plataformas/campos
+- Para produção, configure variáveis de ambiente e domínios adequados
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
